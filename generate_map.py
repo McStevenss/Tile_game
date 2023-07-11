@@ -171,6 +171,7 @@ map_generator.generate_base_map(21,21)
 # map_generator.draw_path(10,4,12,4)
 
 
+#TODO: Some map dimensions doesnt work
 map_generator.auto_generate_rooms()
 
 
