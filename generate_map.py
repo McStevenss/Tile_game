@@ -158,17 +158,10 @@ map_generator = Map_generator()
 #Generate base map and add two rooms
 map_generator.generate_base_map(21,21)
 
-# map_generator.add_room(1,1,10,10)
-# map_generator.add_room(1,11,5,5)
-# map_generator.add_room(6,11,5,5)
+# Add Room
 # map_generator.add_room(12,0,7,15)
-
-
-
-# #Draw path
+# Draw Path
 # map_generator.draw_path(2,10,2,11)
-# map_generator.draw_path(5,13,6,13)
-# map_generator.draw_path(10,4,12,4)
 
 
 #TODO: Some map dimensions doesnt work
