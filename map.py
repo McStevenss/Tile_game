@@ -16,17 +16,20 @@ class Map:
         self.draw_center = draw_center
 
         #Map
-        self.map_data = [
-            [1,1,1,1,1,1,1,1,1,1,1],
-            [1,0,0,0,0,0,0,0,0,0,1],
-            [1,0,0,0,0,0,0,0,0,0,1],
-            [1,0,0,0,0,0,0,0,0,0,1],
-            [1,0,0,0,0,0,0,0,0,0,1],
-            [1,1,1,2,1,0,1,1,1,2,1],
-            [1,0,0,0,1,0,1,0,0,0,1],
-            [1,0,0,0,1,0,1,0,0,0,1],
-            [1,1,1,1,1,1,1,1,1,1,1],
-        ]
+        # self.map_data = [
+        #     [1,1,1,1,1,1,1,1,1,1,1],
+        #     [1,0,0,0,0,0,0,0,0,0,1],
+        #     [1,0,0,0,0,0,0,0,0,0,1],
+        #     [1,0,0,0,0,0,0,0,0,0,1],
+        #     [1,0,0,0,0,0,0,0,0,0,1],
+        #     [1,1,1,2,1,0,1,1,1,2,1],
+        #     [1,0,0,0,1,0,1,0,0,0,1],
+        #     [1,0,0,0,1,0,1,0,0,0,1],
+        #     [1,1,1,1,1,1,1,1,1,1,1],
+        # ]
+
+        self.map_data = self.read_map_from_file("test.txt")
+        
 
         #Misc
         self.wall_tiles = [1]
@@ -34,6 +37,19 @@ class Map:
         self.walkable_tiles = self.get_walkable_tiles()
         self.entities = []
 
+    def read_map_from_file(self,path):
+        f = open(path, "r")
+        map = f.readlines()
+        
+        for idx, row in enumerate(map):
+            map[idx] = row.replace(' \n','')
+            map[idx] = map[idx].split(',')
+            map[idx] = [eval(i) for i in map[idx]]
+
+        print("read map from file:")
+        for row in map:
+            print(row)
+        return map
 
     def draw(self):   
         #Floor color
@@ -47,8 +63,7 @@ class Map:
                     self.screen.blit(self.spritesheet.image_at(31,20), (screen_x,screen_y))
 
                 #Create door
-                if tile == 2:
-                    
+                if tile == 2:        
                     #Check if entity has been created or not
                     entity = self.getEntity(x,y)
                     if entity != None and type(entity) == Door:
@@ -59,6 +74,9 @@ class Map:
                         door = Door(x,y)
                         self.drawEntity(x,y,(door.tileX,door.tileY),door)
 
+                #Path
+                if tile == 9:
+                    self.screen.blit(self.spritesheet.image_at(9,21), (screen_x,screen_y))
 
                 if tile == 3:
                     self.screen.blit(self.spritesheet.image_at(3,21), (screen_x,screen_y))
