@@ -156,7 +156,7 @@ class Map_generator():
 map_generator = Map_generator()
 
 #Generate base map and add two rooms
-map_generator.generate_base_map(25,25)
+map_generator.generate_base_map(21,21)
 
 # map_generator.add_room(1,1,10,10)
 # map_generator.add_room(1,11,5,5)
