@@ -13,7 +13,7 @@ class Player():
         self.x = 1
         self.y = 1
         self.health = 100
-
+        self.local_player = False
         #Screen to draw to
         self.screen = screen
 
@@ -28,6 +28,8 @@ class Player():
         self.map = map
 
         self.inventory = []
+
+        
     
 
     #------------
@@ -39,11 +41,18 @@ class Player():
         if self.health <= 0:
             self.tileCordinate_x = 16
             self.tileCordinate_y = 21
+
+       
     
     #-------------------
     #Player draws itself
     #-------------------
     def draw(self):
+
+        #If player is controlled locally, make map center around them
+        if self.local_player:
+            self.map.set_camera_offset(self.x * self.spritesheet.tilesize,self.y * self.spritesheet.tilesize, centered=self.local_player)
+
         self.map.drawEntity(self.x,self.y, (self.tileCordinate_x,self.tileCordinate_y),self)
 
     #--------------------------------
@@ -51,6 +60,47 @@ class Player():
     #--------------------------------
     def add_item_to_inventory(self,item:Item):
         self.inventory.append(item)
+
+    #-------------
+    #Destroys item
+    #-------------
+    def remove_item_from_inventory(self,item:Item):
+        self.inventory.remove(item)
+
+    #-------------------------
+    #Drops item from inventory
+    #-------------------------
+
+    def drop_item_from_inventory(self,item:Item):
+
+        if item != None:
+            self.inventory.remove(item)
+
+            #Drop at adjacent tile, check if its avalible:
+            if self.map.legalMove(self.x +1,self.y):
+                item.x = self.x +1
+                item.y = self.y
+                self.map.add_item(item)
+                return True
+            
+            elif self.map.legalMove(self.x -1,self.y):
+                item.x = self.x -1
+                item.y = self.y
+                self.map.add_item(item)
+                return True
+            
+            elif self.map.legalMove(self.x,self.y +1):
+                item.x = self.x 
+                item.y = self.y +1
+                self.map.add_item(item)
+                return True
+            
+            elif self.map.legalMove(self.x,self.y -1):
+                item.x = self.x 
+                item.y = self.y -1
+                self.map.add_item(item)
+                return True
+        return False
 
     #-----------------------------------------
     #Check for loot at current player position. if there is loot add it to player inventory and remove from map
@@ -63,6 +113,18 @@ class Player():
             self.map.remove_item(item)
             return True, item
         return False, None
+    
+
+    #----------------------------------------------------------
+    #Set player to local, will make the camera center on player
+    #----------------------------------------------------------
+    def setLocal(self,isLocalPlayer):
+
+        if isLocalPlayer:
+            self.local_player = isLocalPlayer
+            self.map.set_camera_offset(self.x * self.spritesheet.tilesize,self.y * self.spritesheet.tilesize, centered=isLocalPlayer)
+        else:
+            return
     
 
     #--------------------------

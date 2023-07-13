@@ -89,86 +89,156 @@ class Map_generator():
                 error += dx
 
         self.map[y][x] = 9
+        
+    def draw_wall(self, x0, y0, x1, y1):
+        dx = abs(x1 - x0)
+        dy = abs(y1 - y0)
+        sx = 1 if x0 < x1 else -1
+        sy = 1 if y0 < y1 else -1
+
+        x = x0
+        y = y0
+        error = dx - dy
+
+        while x != x1 or y != y1:
+            self.map[y][x] = 1
+
+            if x == x1:
+                y += sy
+            elif y == y1:
+                x += sx
+            elif error > -dx:
+                x += sx
+                error -= dy
+            elif error < dy:
+                y += sy
+                error += dx
+
+        self.map[y][x] = 1
+
+    
+    def generate_map_lines(self, rooms=2, outer_walls=True):
+        map_width = len(self.map[0])
+        map_heigth = len(self.map)
+
+        if outer_walls:
+            #Top
+            self.draw_wall(0,0,map_width-1,0)
+            #Left
+            self.draw_wall(0,0,0,map_heigth-1)
+            #Bottom
+            self.draw_wall(0,map_heigth-1,map_width-1,map_heigth-1)
+            #Right
+            self.draw_wall(map_width-1,0,map_width-1,map_heigth-1)
+
+        for _ in range(rooms):
+
+            r_x0 = random.randint(1, map_width-1)
+            r_x1 = random.randint(1, map_width-1)
+
+            r_y0 = 0
+            r_y1 = map_heigth-1
+
+            self.draw_wall(r_x0,r_y0,r_x1,r_y1)
+
+            r_x0 = 0
+            r_x1 = map_width-1
+
+            r_y0 = random.randint(1, map_heigth-1)
+            r_y1 = random.randint(1, map_heigth-1)
+
+            self.draw_wall(r_x0,r_y0,r_x1,r_y1)
+
+    def add_room_to_map(self,room,mapX=0,mapY=0):
+        map_width = len(self.map[0])
+        map_heigth = len(self.map)
+
+        room_w = len(room[0])
+        room_h = len(room)
+        print(f"Adding room ({room_w},{room_h}) to map with dimensions:",map_width,map_heigth)
+
+        if mapX + room_w < map_width and mapY + room_h < map_heigth:
+            
+            #room fits geometrically
+            for y in range(len(room)):
+                for x,tile in enumerate(room[y]):
+                    
+                    self.map[y+mapY][x+mapX] = tile
+                    
 
 
-    def auto_generate_rooms(self, rooms_horizontal = 4, rooms_vertical = 2, paths = True):
- 
-        rooms_w = (len(self.map[0])) // rooms_horizontal
-        rooms_h = (len(self.map)) // rooms_vertical
 
-        print("Rooms w:",rooms_w)
-        print("Rooms h:",rooms_h)
+        else:
+            print("ERROR: room doesnt fit")
 
-        paths_list = []
-
-        for y in range(rooms_vertical):
-            for x in range(rooms_horizontal):
-                self.add_room(x*rooms_w,y*rooms_h,rooms_w,rooms_h)
-                
-                close = None
-                far = None
-
-                if x <rooms_horizontal-1:
-                    far = (x*rooms_w + (rooms_w -1), y*rooms_h + (rooms_h // 2))
-
-                if x > 0:
-                    close = (x*rooms_w, y*rooms_h + (rooms_h // 2))
-                
-          
-
-                paths_list.append((close,far))
-
-
-        if paths:
-
-            #Horizontal connection
-            prev_far = None
-            for close,far in paths_list:
-
-                if prev_far == None:
-                    prev_far = far
-                    continue
-                x1 = prev_far[0]
-                y1 = prev_far[1]
-                prev_far = far
-
-                x0 = close[0]
-                y0 = close[1]
-                self.draw_path(x0,y0,x1,y1)
-
-            #Vertica connection
-            print("prev",prev_far)
-
-            #pick random room
-            joining_room = random.randint(0, rooms_w-1)
-            print("Vertically joining at room number:",joining_room)
-            #print("start:",rooms_w // 2 + (rooms_w * joining_room), rooms_h-1)
-            #print("end:",rooms_w // 2 + (rooms_w * joining_room), rooms_h)
-            x0,y0 = rooms_w // 2 + (rooms_w * joining_room), rooms_h-1
-            x1,y1 = rooms_w // 2 + (rooms_w * joining_room), rooms_h
-
-            self.draw_path(x0,y0,x1,y1)
-
-
+        
 
 
 #Example use
 map_generator = Map_generator()
 
 #Generate base map and add two rooms
-map_generator.generate_base_map(21,21)
+map_generator.generate_base_map(30,30)
 
-# Add Room
-# map_generator.add_room(12,0,7,15)
-# Draw Path
-# map_generator.draw_path(2,10,2,11)
+map_generator.generate_map_lines(rooms=0,outer_walls=True)
+
+#Add pre defined rooms
+map_generator.rooms["shop"] = [
+    [1,1,1,1,1,1,1,1,1,1],
+    [1,99,1,0,0,1,0,0,0,1],
+    [1,99,2,0,0,0,0,0,0,1],
+    [1,99,1,0,0,1,0,0,0,1],
+    [1,99,1,0,0,1,0,0,0,1],
+    [1,1,1,1,2,1,1,1,1,1]
+]
+
+map_generator.rooms["apartment"] = [
+    [1,1,1,1,1,1,1,1,1,1],
+    [1,0,0,0,0,0,0,0,0,1],
+    [1,0,0,0,0,0,0,0,0,1],
+    [1,0,0,1,0,1,0,0,99,1],
+    [1,0,0,1,0,1,0,0,99,1],
+    [1,1,1,1,2,1,1,1,1,1]
+]
+
+map_generator.rooms["generic_wide_room"] = [
+    [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+    [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+    [1,0,0,0,0,0,0,0,0,0,99,0,0,0,0,0,0,1],
+    [2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2],
+    [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+    [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
+]
+
+map_generator.rooms["small_room"] = [
+    [1, 1, 1, 1],
+    [1, 0, 99,1],
+    [1, 0, 1, 1]
+]
+
+map_generator.rooms["altar_room"] = [
+    [1,1,1,1,0,1,1,1,1],
+    [1,0,0,0,0,0,0,0,1],
+    [1,0,0,0,0,0,0,0,1],
+    [0,0,0,0,0,0,0,0,0],
+    [1,0,0,0,0,0,0,0,1],
+    [1,0,0,0,0,0,0,0,1],
+    [1,1,1,1,0,1,1,1,1]
+]
+
+map_generator.add_room_to_map(map_generator.rooms["shop"],mapX=4,mapY=4)
+map_generator.add_room_to_map(map_generator.rooms["apartment"],mapX=4,mapY=12)
+
+map_generator.add_room_to_map(map_generator.rooms["small_room"],mapX=15,mapY=10)
+
+map_generator.add_room_to_map(map_generator.rooms["small_room"],mapX=20,mapY=10)
+
+map_generator.add_room_to_map(map_generator.rooms["altar_room"],mapX=15,mapY=4)
 
 
-#TODO: Some map dimensions doesnt work
-map_generator.auto_generate_rooms()
 
 
-#DEBUG PRINTOUT OF MAP
+# #DEBUG PRINTOUT OF MAP
 map_H = len(map_generator.map)
 map_W = len(map_generator.map[0])
 
@@ -189,5 +259,4 @@ for idx, row in enumerate(map_generator.map):
 
 #Save map
 map_generator.save_map_to_file("test")
-
 

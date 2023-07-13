@@ -29,13 +29,17 @@ class Map:
         # ]
 
         self.map_data = self.read_map_from_file("test.txt")
-        
+
+        #Camera Offset
+        self.camera_offset_y = (self.screen_height // 2) - ((len(self.map_data) * self.spritesheet.tilesize) // 2)
+        self.camera_offset_x = (self.screen_width // 2) - ((len(self.map_data[0]) * self.spritesheet.tilesize) // 2)    
 
         #Misc
         self.wall_tiles = [1]
         self.items = []
         self.walkable_tiles = self.get_walkable_tiles()
         self.entities = []
+        self.loot_creator = Loot_Creator()
 
     def read_map_from_file(self,path):
         f = open(path, "r")
@@ -73,6 +77,17 @@ class Map:
                         #Entity hasnt been created
                         door = Door(x,y)
                         self.drawEntity(x,y,(door.tileX,door.tileY),door)
+                
+                #Loot
+                if tile == 99:
+                    item = self.loot_creator.get_random_loot()
+                    item.x = x
+                    item.y = y
+                    
+                    self.add_item(item)
+
+                    #set cordinate to 0 so infinite loot doesnt spawn
+                    self.map_data[y][x] = 0
 
                 #Path
                 if tile == 9:
@@ -138,15 +153,25 @@ class Map:
     #-------------------------------------------------------------
     def convertPos(self,x,y):
         if self.draw_center:
-            screen_y = y * self.spritesheet.tilesize + (self.screen_height // 2) - ((len(self.map_data) * self.spritesheet.tilesize) // 2)
-            screen_x = x * self.spritesheet.tilesize + (self.screen_width // 2) - ((len(self.map_data[0]) * self.spritesheet.tilesize) // 2)
+            screen_y = y * self.spritesheet.tilesize + self.camera_offset_y #(self.screen_height // 2) - ((len(self.map_data) * self.spritesheet.tilesize) // 2)
+            screen_x = x * self.spritesheet.tilesize + self.camera_offset_x #(self.screen_width // 2) - ((len(self.map_data[0]) * self.spritesheet.tilesize) // 2)
         else:
             screen_y = y * self.spritesheet.tilesize
             screen_x = x * self.spritesheet.tilesize
 
         return screen_x,screen_y
     
-
+    #----------------------------------------------
+    #Set the camera offset target to something else
+    #----------------------------------------------
+    def set_camera_offset(self,offset_x,offset_y, centered = False):
+        if centered:
+            self.camera_offset_x = (self.screen_width // 2) - offset_x  #- ((len(self.map_data[0]) * self.spritesheet.tilesize) // 2)
+            self.camera_offset_y = (self.screen_height // 2) - offset_y #- ((len(self.map_data) * self.spritesheet.tilesize) // 2)
+        else:
+            self.camera_offset_x = offset_x
+            self.camera_offset_y = offset_y
+            
     #-------------------------------------------
     #Generic separate draw function for Entities (anything thats not a wall)
     #-------------------------------------------

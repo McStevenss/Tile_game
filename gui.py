@@ -21,6 +21,11 @@ class Gui:
         self.max_messages = 10
         self.action_texts = []
 
+        #Inventory Navigation
+        self.show_inv_cursor = False
+        self.cursor_x = 0
+        self.cursor_y = 0
+
 
         #DOGSHIT solution but i dont want player to be owned by gui....
         self.inventory = []
@@ -45,7 +50,7 @@ class Gui:
         self.texts.append([font.render(text, True, color),pos])
 
     def add_text_action_log(self, text):
-        font = pygame.font.Font('freesansbold.ttf', 18)
+        font = pygame.font.Font('freesansbold.ttf', 15)
         self.action_texts.append(font.render(text, True, (255,50,50)))     
 
 
@@ -55,8 +60,8 @@ class Gui:
     def draw_action_log(self):
         
         #Draw window rectangle
-        window = pygame.Rect(0,0,260,260)
-        window_border = pygame.Rect(0,0,260,260)
+        window = pygame.Rect(0,0,270,260)
+        window_border = pygame.Rect(0,0,270,260)
 
         pygame.draw.rect(self.screen, (30,30,30), window)
         pygame.draw.rect(self.screen, (255,255,255), window_border,2)
@@ -86,7 +91,6 @@ class Gui:
         pygame.draw.rect(self.screen, (30,30,30), inventory)
         pygame.draw.rect(self.screen, (255,255,255), inventory_border,2)
 
-
         #populate inventory GUI
         new_row = 0
         for idx, item in enumerate(self.inventory):
@@ -100,6 +104,41 @@ class Gui:
             #Draw item in inventory
             item_img = self.spritesheet.image_at(item.tileX,item.tileY)
             self.screen.blit(item_img, (inv_x,inv_y))
+
+
+        #SELECTOR
+        if self.show_inv_cursor:
+            selector = pygame.Rect(self.cursor_x*32 + 2, 268 + (self.cursor_y * 32),32,32)
+            pygame.draw.rect(self.screen, (255,255,255), selector,2)
+
+    #------------------
+    #Navigate inventory
+    #------------------
+    def move_cursor(self,dx=0,dy=0):
+
+        MAX_TILE = 7
+
+        self.cursor_x +=dx
+        self.cursor_y +=dy
+
+        if self.cursor_x > MAX_TILE or self.cursor_x < 0:
+            self.cursor_x = 0
+        
+        if self.cursor_y > MAX_TILE or self.cursor_y < 0:
+            self.cursor_y = 0
+
+    def get_item_at_cursor(self):
+        inv_idx = self.cursor_x + self.cursor_y
+
+        if inv_idx > len(self.inventory)-1:
+            return None
+        else:
+            return self.inventory[inv_idx]
+        
+      
+
+        
+        
 
 
 
