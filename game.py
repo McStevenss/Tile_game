@@ -36,15 +36,19 @@ class Game:
         # self.gui.add_text("This is a test text #2", (15,33))
 
         #DEBUG
-        # item = Item(3,3,name="Boots Of Speed")
-        # item2 = Item(4,3,name="Ring Of Icarus",tileX=0,tileY=14)
-        # item3 = Item(5,3,name="X-ray googles",tileX=3,tileY=15)
+        item0 = Item(2,1,name="Key",tileX=32,tileY=14)
+        item1 = Item(3,1,name="Key",tileX=32,tileY=14)
+        item2 = Item(4,1,name="Key",tileX=32,tileY=14)
+        item3 = Item(5,1,name="Key",tileX=32,tileY=14)
+        item4 = Item(6,1,name="Key",tileX=32,tileY=14)
+        item5 = Item(7,1,name="Key",tileX=32,tileY=14)
+        item6 = Item(8,1,name="Key",tileX=32,tileY=14)
+        item7 = Item(9,1,name="Key",tileX=32,tileY=14)
+        item8 = Item(10,1,name="Key",tileX=32,tileY=14)
 
-        item10 = Item(5,1,name="Key",tileX=32,tileY=14)
-        item11 = Item(1,6,name="Key",tileX=32,tileY=14)
 
 
-        loot = [item10,item11]
+        loot = [item0,item1,item2,item3,item4,item5,item6,item7,item8]
        
         for item in loot:
             self.map.add_item(item)

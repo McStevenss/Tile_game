@@ -24,6 +24,16 @@ class Controller():
         self.gui.inventory = self.player.inventory
         self.gui.add_text(f"Health: {self.player.health}",(315,15),size=25)
 
+        self.gui.stats = [self.player.level,
+                            self.player.experience,
+                            self.player.health,
+                            self.player.weapon_damage,
+                            self.player.strength,
+                            self.player.dexterity,
+                            self.player.constitution,
+                            self.player.intelligence,
+                            self.player.wisdom]
+
         #Bad solution
         self.player.setLocal(True)
 
@@ -78,27 +88,47 @@ class Controller():
                     self.gui.move_cursor(dy=1)
 
                 #Inspect item
-                if event.key == K_RETURN:
+                if event.key == K_INSERT:
                     item = self.gui.get_item_at_cursor()
-                    self.gui.add_text_action_log(f"{item.name if item != None else 'Hmm?'}")
+                    if item != None:
+                        self.gui.add_text_action_log(f">{item.name}")
+                        print(item.stat_modifier)
+                        for stat in item.stat_modifier:
+                            self.gui.add_text_action_log(f">>{stat}")
+
 
                 #Drop item
                 if event.key == K_DELETE:
                     item = self.gui.get_item_at_cursor()
 
-                    if item == None:
-                        self.gui.add_text_action_log(f"I cannot drop that")
-                    else:
-                        if self.player.drop_item_from_inventory(item):
-                            self.gui.add_text_action_log(f"-{item.name}")
+                    if item != None:
+                        
+                        if item.isequipped:
+                            self.gui.add_text_action_log(f"I need to unequip first")
                         else:
-                            self.gui.add_text_action_log(f"No space to drop that")
+                            if self.player.drop_item_from_inventory(item):
+                                self.gui.add_text_action_log(f"-{item.name}")
+                            else:
+                                self.gui.add_text_action_log(f"No space to drop that")
+                        
+                    else:
+                        self.gui.add_text_action_log(f"I cannot drop that")
                         
 
                 #Equip/use
-                # if event.key == K_RETURN:
-                #     item = self.gui.get_item_at_cursor()
-                #     self.gui.add_text_action_log(f"{item.name if item != None else 'Hmm?'}")
+                if event.key == K_RETURN:
+                    item = self.gui.get_item_at_cursor()
+
+                    if item != None:
+                        action = self.player.use_item(item)
+
+                        if action != None:
+                            self.gui.add_text_action_log(f"{action} {item.name}")
+                        else:
+                            self.gui.add_text_action_log(f"I cant equip that!")
+                    else:
+                        self.gui.add_text_action_log(f"I cant use that!")
+                    #self.gui.add_text_action_log(f"{item.name if item != None else 'Hmm?'}")
 
 
             #Check if where player have walked contains loot

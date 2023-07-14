@@ -18,7 +18,7 @@ class Gui:
         self.texts = []
         
         #Action log
-        self.max_messages = 10
+        self.max_messages = 13
         self.action_texts = []
 
         #Inventory Navigation
@@ -29,14 +29,17 @@ class Gui:
 
         #DOGSHIT solution but i dont want player to be owned by gui....
         self.inventory = []
+        self.stats = []
 
     #---------------------------------------
     #Controller owns the GUI, the gui is generic
     #---------------------------------------
     def draw(self):
+        self.texts = []
 
         self.draw_action_log()
         self.draw_inventory()
+        self.draw_stats()
 
         for text, pos in self.texts:
             self.screen.blit(text, pos)
@@ -105,11 +108,40 @@ class Gui:
             item_img = self.spritesheet.image_at(item.tileX,item.tileY)
             self.screen.blit(item_img, (inv_x,inv_y))
 
+            #Indicate if its equipped
+            #print("gui, item equipped",item.isequipped)
+            if item.isequipped:
+                equip_rect = pygame.Rect(inv_x,inv_y,32,32)
+                pygame.draw.rect(self.screen, (59,181,65), equip_rect,2)
+
 
         #SELECTOR
         if self.show_inv_cursor:
             selector = pygame.Rect(self.cursor_x*32 + 2, 268 + (self.cursor_y * 32),32,32)
             pygame.draw.rect(self.screen, (255,255,255), selector,2)
+
+    #-------------
+    #Draw stat box
+    #-------------
+    def draw_stats(self):
+        
+        stats_window = pygame.Rect(0,530,260,230)
+        stats_window_border = pygame.Rect(0,530,260,230)
+
+        pygame.draw.rect(self.screen, (30,30,30), stats_window)
+        pygame.draw.rect(self.screen, (255,255,255), stats_window_border,2)
+
+        #Print stats
+        self.add_text(f"Level: {self.stats[0]}",(4,535))
+        self.add_text(f"XP: {self.stats[1]}",(4,535 + 17*1))
+        self.add_text(f"HP: {self.stats[2]}",(4,535 + 17*2))
+        self.add_text(f"DMG: {self.stats[3]}",(4,535 + 17*3))
+        
+        self.add_text(f"STR: {self.stats[4]}",(4,535 + 20*4), (181,65,19))
+        self.add_text(f"DEX: {self.stats[5]}",(4,535 + 20*5), (255,208,0))
+        self.add_text(f"CON: {self.stats[6]}",(4,535 + 20*6), (255,0,233))
+        self.add_text(f"INT: {self.stats[7]}",(4,535 + 20*7), (0,119,255))
+        self.add_text(f"WIS: {self.stats[8]}",(4,535 + 20*8), (45,66,255))
 
     #------------------
     #Navigate inventory
@@ -128,7 +160,8 @@ class Gui:
             self.cursor_y = 0
 
     def get_item_at_cursor(self):
-        inv_idx = self.cursor_x + self.cursor_y
+        max_icons_width = 8
+        inv_idx = self.cursor_x + (self.cursor_y * max_icons_width) 
 
         if inv_idx > len(self.inventory)-1:
             return None

@@ -26,12 +26,19 @@ class Player():
 
         #gravestone tile x16, y21
         self.map = map
-
         self.inventory = []
+        self.equipped = []
 
+        #Stats
+        self.level = 1
+        self.experience = 0
+        self.strength = 0
+        self.dexterity = 0
+        self.constitution = 0
+        self.intelligence = 0
+        self.wisdom = 0
+        self.weapon_damage = 1
         
-    
-
     #------------
     #Update logic
     #------------
@@ -42,8 +49,7 @@ class Player():
             self.tileCordinate_x = 16
             self.tileCordinate_y = 21
 
-       
-    
+ 
     #-------------------
     #Player draws itself
     #-------------------
@@ -148,3 +154,128 @@ class Player():
                             else:
                                 return "Door-locked"
                     return "Door is locked"
+
+    #------------------------
+    #Update item in inventory
+    #------------------------
+    def update_item_in_inventory(self,item:Item):
+        try:
+            inventory_idx = self.inventory.index(item)
+            self.inventory[inventory_idx] = item
+            return True
+        except:
+            return False
+
+    #-----------------------
+    #Applies a stat increase
+    #-----------------------
+    def apply_stat(self,stat,ammount):
+
+        if stat == "DMG":
+            self.weapon_damage += ammount
+        elif stat == "HP":
+            self.health += ammount
+        elif stat =="STR":
+            self.strength += ammount
+        elif stat == "LVL":
+            self.level += ammount
+        elif stat == "XP":
+            self.experience += ammount
+        elif stat == "DEX":
+            self.dexterity += ammount
+        elif stat == "CON":
+            self.constitution += ammount
+        elif stat == "INT":
+            self.intelligence += ammount
+        elif stat == "WIS":
+            self.wisdom += ammount
+
+        return
+    
+
+    #----------
+    #Parse stat
+    #----------
+    def parse_stat(self,stat, inverse=False):
+
+        if inverse == False:
+            if "+" in stat:   
+                parsed_stat = stat.split("+")
+                return parsed_stat[0], int(parsed_stat[1])
+            else:
+                parsed_stat = stat.split("-")
+                return parsed_stat[0], -int(parsed_stat[1])
+        else:
+            if "+" in stat:   
+                parsed_stat = stat.split("+")
+                return parsed_stat[0], -int(parsed_stat[1]) 
+            else:
+                parsed_stat = stat.split("-")
+                return parsed_stat[0], +int(parsed_stat[1])
+
+
+    #--------------------
+    #Apply item modifiers, will return the action used
+    #--------------------
+    def use_item(self,item:Item):
+        stats,consumable,equippable = item.use()
+
+        # #Connect modifiers with players
+        # stat_map = {"DMG":self.weapon_damage,
+        #             "HP": self.health,
+        #             "STR":self.strength,
+        #             "LVL":self.level,
+        #             "XP": self.experience,
+        #             "DEX":self.dexterity,
+        #             "CON":self.constitution,
+        #             "INT":self.intelligence,
+        #             "WIS":self.wisdom}
+        
+        
+        #Consume consumable
+        if consumable:
+            #apply stats
+            for stat in stats:
+                    stat, ammount = self.parse_stat(stat)
+                    self.apply_stat(stat, ammount)
+
+            #remove item after use because its consumable
+            self.remove_item_from_inventory(item)
+            return "[D]"
+        
+        #Equip item
+        #Important to add stats when equipped
+        if equippable and item.isequipped == False:
+            #apply stats that item gives
+            for stat in stats:
+                stat, ammount = self.parse_stat(stat)
+                self.apply_stat(stat, ammount)
+
+
+            #update item is equipped
+            item.isequipped = True
+            self.update_item_in_inventory(item)
+            self.equipped.append(item)
+
+            if item.blessed:
+                return "[E]"
+            else:
+                return "[E][c]"
+
+        #Unequip item
+        #Remove stats!  
+        if equippable and item.isequipped == True:       
+            #apply stats that item gives (Now reversed)
+            for stat in stats:
+                stat, ammount = self.parse_stat(stat,inverse=True)
+                self.apply_stat(stat, ammount)
+
+                    
+            item.isequipped = False
+            self.update_item_in_inventory(item)
+            self.equipped.remove(item)
+            if item.blessed:
+                return "[U]"
+            else:
+                return "[U][c]"
+
