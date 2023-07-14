@@ -92,7 +92,6 @@ class Controller():
                     item = self.gui.get_item_at_cursor()
                     if item != None:
                         self.gui.add_text_action_log(f">{item.name}")
-                        print(item.stat_modifier)
                         for stat in item.stat_modifier:
                             self.gui.add_text_action_log(f">>{stat}")
 

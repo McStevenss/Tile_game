@@ -85,6 +85,7 @@ class Loot_Creator():
             "Projectile": (0,3,10),
             "Spear": (4,10,10),
             "Dagger": (11,15,10),
+            "Sword": (29,34,10),
             "Scroll": (10,34,17),
             "Sheild": (0,5,12),
             "Ring": (0,13,14),
@@ -124,7 +125,7 @@ class Loot_Creator():
         stat = self.postfix_modifier[item_postfix]
         modifier = self.prefix_modifier[item_prefix]
 
-        curse_or_blessed = random.choice(["+","+","+","-"])
+        curse_or_blessed = random.choice(["+","+","+","+","+","-"])
         if curse_or_blessed == "-":
             item.cursed = True
         else:
@@ -161,7 +162,7 @@ class Loot_Creator():
         stat = self.postfix_modifier[item_postfix]
         modifier = self.prefix_modifier[item_prefix]
 
-        curse_or_blessed = random.choice(["+","+","+","-"])
+        curse_or_blessed = random.choice(["+","+","+","+","+","-"])
         if curse_or_blessed == "-":
             item.cursed = True
         else:
@@ -214,7 +215,6 @@ class Loot_Creator():
         item.name = f"{item_prefix} {item_name} {item_postfix}"
         return item
 
-
     #-------------
     #Generate loot
     #-------------
@@ -248,7 +248,7 @@ class Loot_Creator():
             item = self.generate_consumable(loot_type,loot_rarity)
 
         #Weapon
-        elif base_item in ["Spear", "Poleaxe", "Dagger"]:
+        elif base_item in ["Spear", "Poleaxe", "Dagger","Sword"]:
             item = self.generate_weapon(loot_type,loot_rarity)
         
         #Armor/wearables

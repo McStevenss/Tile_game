@@ -8,6 +8,7 @@ from gui import *
 from player import *
 from controller import *
 from item import *
+from npc import *
 
 class Game:
     def __init__(self):
@@ -54,6 +55,8 @@ class Game:
             self.map.add_item(item)
 
         
+        self.test_npc = NPC(self.map, 10,10,"George", 100, True)
+
         #/DEBUG
 
 
@@ -72,6 +75,8 @@ class Game:
         self.map.draw()
         self.gui.draw()
         self.player.draw()
+
+        self.test_npc.draw()
         pygame.display.flip()
         self.fpsClock.tick(self.fps)
 

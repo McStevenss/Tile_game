@@ -5,6 +5,7 @@ from pygame.locals import *
 from spritesheet import *
 from item import *
 from map import *
+from npc import *
 
 
 class Player():
@@ -154,6 +155,16 @@ class Player():
                             else:
                                 return "Door-locked"
                     return "Door is locked"
+                
+            if type(entity) == NPC:
+                
+                #Talk to friendly NPCs
+                if entity.friendly:
+                    chat_line = entity.chat()
+                    return f"{entity.name}: {chat_line}"
+                #Attack unfriendly NPCs
+                else:
+                    pass
 
     #------------------------
     #Update item in inventory
