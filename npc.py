@@ -22,7 +22,7 @@ class NPC():
         self.description = "A npc"
         
         self.chat_line_idx = 0
-        self.chat_lines = ["Hi there!", "Im a default npc!", "whats up?"]
+        self.chat_lines = [f"Im {self.name}!","Hi there!", "Im a default npc!", "whats up?"]
         self.friendly = friendly
         self.health = health
 
