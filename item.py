@@ -4,6 +4,7 @@ import pygame
 from pygame.locals import *
 from spritesheet import *
 import random
+import json
 
 class Item():
     def __init__(self, x,y, name="Item", tileX = 18, tileY = 13):
@@ -44,6 +45,28 @@ class Item():
 
     def use(self):
         return self.stat_modifier, self.consumable,self.equippable
+    
+    #-------
+
+    def pack_for_server(self, usejson=True):
+        item_object = {
+            "name": self.name,
+            "x":self.x,
+            "y":self.y,
+            "tileX":self.tileX,
+            "tileY":self.tileY,
+            "description": self.description,
+            "consumable":self.consumable,
+            "equippable":self.equippable,
+            "cursed":self.cursed,
+            "blessed":self.blessed,
+            "isequipped":self.isequipped,
+            "stat_modifier": self.stat_modifier
+        }
+        if usejson:
+            return json.dumps(item_object, indent=4)
+        else:
+            return item_object
 
 
 class Door():

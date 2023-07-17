@@ -1,5 +1,5 @@
 import sys
- 
+from twisted.internet import reactor
 import pygame
 from pygame.locals import *
 from spritesheet import *
@@ -13,7 +13,8 @@ from npc import *
 class Game:
     def __init__(self):
         pygame.init()
-
+        self.clientConnection = None
+        self.sent_player_info = False
         #Fps
         self.fps = 60
         self.fpsClock = pygame.time.Clock()
@@ -30,7 +31,9 @@ class Game:
         self.map = Map(self.spritesheet, self.screen, True)
         self.gui = Gui(self.spritesheet, self.screen)
         self.player = Player(self.spritesheet, self.screen, self.map)
+        self.players = []
         self.controller = Controller(self.player, self.gui)
+        
 
 
         # self.gui.add_text("This is a test text #1", (15,0))
@@ -58,6 +61,7 @@ class Game:
         self.test_npc = NPC(self.map, 10,10,"George", 100, True)
 
         #/DEBUG
+        self.send_message(self.player.pack_for_server())
 
 
 
@@ -65,6 +69,7 @@ class Game:
     def check_events(self):
         for event in pygame.event.get():
             if event.type == QUIT:
+                reactor.stop()
                 pygame.quit()
                 sys.exit()
 
@@ -84,9 +89,29 @@ class Game:
         self.controller.update()
         self.player.update()
 
+
+        #Give server player info
+        if self.sent_player_info == False:
+            player_data = self.player.pack_for_server(command="new_player")
+            didSend = self.send_message(player_data)
+            if didSend:
+                self.sent_player_info = True
+                print("Sent player info")
+
+        reactor.iterate()
+
     def run(self):
         #Game loop
         while True:
             self.update()
             self.check_events()
             self.draw()
+
+
+    def send_message(self, message):
+        if self.clientConnection and self.clientConnection.client_instance:      
+            self.clientConnection.client_instance.sendData(message.encode())
+            return True   
+        else:
+            print("Not connected to the server yet. Message not sent.")
+            return False

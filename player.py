@@ -6,11 +6,13 @@ from spritesheet import *
 from item import *
 from map import *
 from npc import *
+import json
 
 
 class Player():
-    def __init__(self, spritesheet:Spritesheet, screen, map:Map):
+    def __init__(self, spritesheet:Spritesheet, screen, map:Map, name="Unknown"):
         #Position & misc
+        self.name=name
         self.x = 1
         self.y = 1
         self.health = 100
@@ -49,6 +51,44 @@ class Player():
         if self.health <= 0:
             self.tileCordinate_x = 16
             self.tileCordinate_y = 21
+
+
+    #---------------------------------------------------
+    #Packing neccesary player information to JSON object
+    #---------------------------------------------------
+    def pack_for_server(self, command=None):
+        player_object = {
+            "name": self.name,
+            "x": self.x,
+            "y": self.y,
+            "health": self.health,
+            "inventory": [],
+            "equipped": [],
+            "tileCordinate_x": self.tileCordinate_x,
+            "tileCordinate_y": self.tileCordinate_y,
+            "level": self.level,
+            "experience":self.experience,
+            "strength":self.strength,
+            "dexterity": self.dexterity,
+            "constitution":self.constitution,
+            "intelligence":self.intelligence,
+            "wisdom": self.wisdom,
+            "weapon_damage" :self.weapon_damage
+        }
+
+        #Handle items in inventory
+        for item in self.inventory:
+            player_object["inventory"].append(item.pack_for_server(usejson=False))
+       
+        #Handle equipped items
+        for item in self.equipped:
+            player_object["equipped"].append(item.pack_for_server(usejson=False))
+
+        if command !=None:
+            player_object["command"] = command
+
+        return json.dumps(player_object, indent=4)
+
 
  
     #-------------------
